@@ -1,6 +1,5 @@
-# Standard Node build — no native compilation needed with kafkajs
 [phases.install]
-cmds = ["npm ci"]
+cmds = ["npm install"]
 
 [start]
 cmd = "node server.js"
