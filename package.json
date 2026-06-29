@@ -1,0 +1,17 @@
+{
+  "name": "traindash-bridge",
+  "version": "1.0.0",
+  "description": "Darwin Kafka → REST bridge for TrainDash",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "dependencies": {
+    "kafkajs": "^2.2.4",
+    "express": "^4.18.2",
+    "cors": "^2.8.5"
+  }
+}
