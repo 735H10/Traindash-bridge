@@ -1,0 +1,7 @@
+# node-rdkafka wraps librdkafka (C library) and must be compiled on install.
+# These system packages are required for npm install to succeed on Railway.
+[phases.setup]
+nixPkgs = ["python3", "gcc", "gnumake", "cyrus_sasl", "openssl", "zlib"]
+
+[phases.install]
+cmds = ["npm install --build-from-source"]
