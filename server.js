@@ -223,14 +223,17 @@ function rebuildBoards() {
 }
 
 // ── Kafka consumer ────────────────────────────────────
+// Confluent Cloud requires authorizationIdentity: '' for SASL PLAIN
+// Without this kafkajs sends a non-compliant handshake and auth fails
 const kafka = new Kafka({
   clientId: 'traindash-bridge',
   brokers:  [CONFIG.kafka.broker],
   ssl:      true,
   sasl: {
-    mechanism: 'plain',
-    username:  CONFIG.kafka.username,
-    password:  CONFIG.kafka.password,
+    mechanism:             'plain',
+    authorizationIdentity: '',
+    username:              CONFIG.kafka.username,
+    password:              CONFIG.kafka.password,
   },
   retry: { initialRetryTime: 2000, retries: 10 },
   logLevel: 1, // ERROR only — keeps Railway logs clean
@@ -240,6 +243,10 @@ const consumer = kafka.consumer({ groupId: CONFIG.kafka.consumerGroup });
 
 async function startKafka() {
   console.log('🔌 Connecting to Darwin Kafka feed...');
+  console.log(`   Broker:  ${CONFIG.kafka.broker}`);
+  console.log(`   Topic:   ${CONFIG.kafka.topic}`);
+  console.log(`   Group:   ${CONFIG.kafka.consumerGroup}`);
+  console.log(`   User:    ${CONFIG.kafka.username}`);
   await consumer.connect();
   connected = true;
   console.log('✅ Connected — waiting for train data...');
@@ -325,5 +332,10 @@ process.on('SIGINT',  shutdown);
 // ── Boot ──────────────────────────────────────────────
 startKafka().catch(err => {
   console.error('❌ Failed to connect to Kafka:', err.message);
+  if (err.message.includes('Authentication failed')) {
+    console.error('   → Check KAFKA_USERNAME and KAFKA_PASSWORD in Railway Variables');
+    console.error('   → Ensure your Rail Data Marketplace subscription is still active');
+    console.error('   → The consumer group ID must match exactly what NR issued you');
+  }
   process.exit(1);
 });
