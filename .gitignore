@@ -1,0 +1,11 @@
+__pycache__/
+*.pyc
+*.pyo
+.env
+.env.*
+Dockerfile
+Dockerfile.*
+docker-compose.yml
+nixpacks.toml
+*.log
+.DS_Store
