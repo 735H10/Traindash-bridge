@@ -1,4 +1,23 @@
+# Dependencies
 node_modules/
+__pycache__/
+*.pyc
+*.pyo
+
+# Environment / secrets â€” NEVER commit these
 .env
+.env.*
+
+# Dockerfile â€” Railway must use Nixpacks only, never a local Dockerfile
+# A Dockerfile in the repo causes Railway to bake env vars into image layers
+Dockerfile
+Dockerfile.*
+docker-compose.yml
+docker-compose.yaml
+
+# Logs
 *.log
+
+# OS
 .DS_Store
+Thumbs.db
