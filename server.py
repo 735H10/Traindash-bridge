@@ -12,7 +12,7 @@ from confluent_kafka import Consumer
 
 BROKER   = os.environ.get('KAFKA_BROKER',   'pkc-z3p1v0.europe-west2.gcp.confluent.cloud:9092')
 TOPIC    = os.environ.get('KAFKA_TOPIC',    'prod-1010-Darwin-Train-Information-Push-Port-IIII2_0-JSON')
-GROUP_ID = os.environ.get('KAFKA_GROUP',    'SC-c8a3c6c8-2c1a-4063-9e5f-55beb9da3309-v2')
+GROUP_ID = os.environ.get('KAFKA_GROUP',    'SC-c8a3c6c8-2c1a-4063-9e5f-55beb9da3309')
 USERNAME = os.environ.get('KAFKA_USERNAME', '')
 PASSWORD = os.environ.get('KAFKA_PASSWORD', '')
 PORT     = int(os.environ.get('PORT', 3000))
