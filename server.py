@@ -193,15 +193,16 @@ def run_kafka():
     global connected, msg_count, last_msg_at
 
     conf = {
-        'bootstrap.servers':  BROKER,
-        'security.protocol':  'SASL_SSL',
-        'sasl.mechanism':     'PLAIN',
-        'sasl.username':      USERNAME,
-        'sasl.password':      PASSWORD,
-        'group.id':           GROUP_ID,
-        'auto.offset.reset':  'latest',
-        'enable.auto.commit': True,
-        'session.timeout.ms': 30000,
+        'bootstrap.servers':        BROKER,
+        'security.protocol':        'SASL_SSL',
+        'sasl.mechanism':           'PLAIN',
+        'sasl.username':            USERNAME,
+        'sasl.password':            PASSWORD,
+        'group.id':                 GROUP_ID,
+        'auto.offset.reset':        'earliest',
+        'enable.auto.commit':       False,
+        'session.timeout.ms':       30000,
+        'max.poll.interval.ms':     300000,
     }
 
     print('Connecting to Kafka...')
@@ -219,10 +220,24 @@ def run_kafka():
                 print(f'Kafka error: {msg.error()}')
                 continue
             try:
-                payload = json.loads(msg.value().decode('utf-8'))
-                raw     = base64.b64decode(payload.get('bytes', ''))
-                try:    xml = gzip.decompress(raw).decode('utf-8')
-                except: xml = raw.decode('utf-8')
+                raw_val = msg.value()
+                if msg_count == 0:
+                    print(f'First message received. Partition: {msg.partition()}, Offset: {msg.offset()}')
+                    print(f'Raw value preview: {raw_val[:200]}')
+
+                # Messages may be plain JSON or base64-wrapped XML
+                try:
+                    payload = json.loads(raw_val.decode('utf-8'))
+                    raw     = base64.b64decode(payload.get('bytes', ''))
+                    try:    xml = gzip.decompress(raw).decode('utf-8')
+                    except: xml = raw.decode('utf-8')
+                except Exception:
+                    # Try treating the raw value directly as XML
+                    try:    xml = gzip.decompress(raw_val).decode('utf-8')
+                    except: xml = raw_val.decode('utf-8')
+
+                if msg_count == 0:
+                    print(f'XML preview: {xml[:300]}')
 
                 # Quick relevance filter — skip messages with no watched stations
                 if not any(t in xml for t in TIPLOC if TIPLOC.get(t) in WATCH):
